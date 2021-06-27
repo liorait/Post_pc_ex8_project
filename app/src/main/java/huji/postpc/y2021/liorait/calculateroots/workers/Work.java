@@ -76,10 +76,14 @@ public class Work extends Worker {
         int i = 2;
 
         while (i <= numberToCalculateRootsFor / 2){
-            Integer currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor/2.0)) * 100);
+          //  Integer currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor/2.0)) * 100);
             //if (newProgress != progress){
           //  progress = currentProgress;
-            this.setProgressAsync(new Data.Builder().putInt("progress",  currentProgress).build());
+            if (i%4 == 0){
+                int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor/2.0)) * 100);
+                this.setProgressAsync(new Data.Builder().putInt("progress",  currentProgress).build());
+            }
+            //this.setProgressAsync(new Data.Builder().putInt("progress",  currentProgress).build());
             //}
 
             long root = (long) (numberToCalculateRootsFor / i);

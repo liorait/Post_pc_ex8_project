@@ -57,6 +57,9 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                 String secondRoot = roots.second.toString();
                 holder.rootsTextView.setText(firstRoot + " * " + secondRoot);
             }
+            else{
+                holder.rootsTextView.setText("number is prime");
+            }
         }
     }
 

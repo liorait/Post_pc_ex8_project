@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 userInputLong = Long.parseLong(userInputString);
             }
             catch (NumberFormatException e){
-                //Toast.makeText(this, "could not convert String to Long", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "could not convert String to Long", Toast.LENGTH_SHORT).show();
                 Log.e("error", "could not convert String to Long");
                 return;
             }
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                         Pair<Long, Long> roots = new Pair<>(first_root, second_root);
                         item.setRoots(roots);
                         item.setStatus("done");
+                        adapter.notifyDataSetChanged();
 
                        // String rootsStr = outputData.getString("roots");
                       //  if (!rootsStr.equals("")) {
@@ -154,11 +155,13 @@ public class MainActivity extends AppCompatActivity {
                     else if (is_prime.equals("true")){
                         TextView rootsTextView = findViewById(R.id.rootsTextView);
                         rootsTextView.setText("number is prime");
+                        item.setStatus("done");
+                        adapter.notifyDataSetChanged();
                     }
                 }
                 // update progress bar
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)){
-                    Integer progress = workInfo.getProgress().getInt("progress", 0);
+                    int progress = workInfo.getProgress().getInt("progress", 0);
                     item.setProgress(progress);
                     adapter.notifyDataSetChanged();
                 }
