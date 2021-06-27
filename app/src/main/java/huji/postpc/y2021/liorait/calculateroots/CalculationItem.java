@@ -3,15 +3,17 @@ package huji.postpc.y2021.liorait.calculateroots;
 import android.util.Pair;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class CalculationItem {
     private String number;
     private String status;
-    private String itemId;
+    private UUID itemId;
     private boolean isPrime;
+    private int progress;
     private Pair<Long, Long> roots;
 
-    public CalculationItem(String id, String number, String status) {
+    public CalculationItem(UUID id, String number, String status) {
         this.number = number;
         this.status = status;
         this.itemId = id;
@@ -27,7 +29,7 @@ public class CalculationItem {
         this.number = number;
     }
 
-    public String getId() {
+    public UUID getId() {
         return itemId;
     }
 
@@ -39,8 +41,24 @@ public class CalculationItem {
         return status;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.itemId = id;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public Pair<Long, Long> getRoots() {
+        return roots;
+    }
+
+    public void setRoots(Pair<Long, Long> roots) {
+        this.roots = roots;
     }
 
 }

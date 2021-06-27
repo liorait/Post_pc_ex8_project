@@ -32,10 +32,13 @@ public class CalculateRootsApplication extends Application {
         super.onCreate();
         instance = this;
         dataBase = new LocalDataBase(this); // pass the current context to allow broadcasts
+
         // singleton of work manager
         androidx.work.WorkManager workManager = androidx.work.WorkManager.getInstance(this);
+
         // If not canceling the work continues to re-run
        // workManager.cancelAllWork();
+        /**
         Constraints.Builder constraintsBuilder = new Constraints.Builder();
 
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(Work.class)
@@ -56,6 +59,7 @@ public class CalculateRootsApplication extends Application {
         workInfoByIdLiveData.observeForever(workInfo -> {
             System.out.println("observing work status " + workInfo);
         });
+         */
     } // end of on create
 
     UUID getWorkerId(){

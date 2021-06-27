@@ -1,9 +1,12 @@
 package huji.postpc.y2021.liorait.calculateroots;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +38,7 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         return new CalculationItemsHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull CalculationItemsHolder holder, int position) {
         CalculationItem item = this.list.get(position);
@@ -44,6 +48,16 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         holder.deleteButton.setVisibility(View.GONE);
         holder.cancelButton.setVisibility(View.VISIBLE);
         holder.progressBar.setVisibility(View.VISIBLE);
+        holder.progressBar.setProgress(item.getProgress());
+
+        if (item.getStatus().equals("done")) {
+            Pair<Long, Long> roots = item.getRoots();
+            if (roots != null) {
+                String firstRoot = roots.first.toString();
+                String secondRoot = roots.second.toString();
+                holder.rootsTextView.setText(firstRoot + " * " + secondRoot);
+            }
+        }
     }
 
     @Override

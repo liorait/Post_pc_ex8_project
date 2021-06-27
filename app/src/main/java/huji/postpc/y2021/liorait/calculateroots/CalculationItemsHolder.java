@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class CalculationItemsHolder extends RecyclerView.ViewHolder {
 
-    protected ArrayList<CalculationItem> calculationsList; // list of todo_ items
+    protected ArrayList<CalculationItem> calculationsList; // list of calculation items
     TextView numberText;
     TextView rootsTextView;
     TextView cancelButton;

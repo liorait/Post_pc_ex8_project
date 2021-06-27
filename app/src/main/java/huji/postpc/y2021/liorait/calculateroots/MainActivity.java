@@ -15,6 +15,7 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import huji.postpc.y2021.liorait.calculateroots.workers.Work;
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public CalculationItemsHolder holder = null;
     public CalculationAdapterClass adapter = null;
     public LocalDataBase dataBase = null;
+    WorkManager workManager = WorkManager.getInstance(this);
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -47,22 +50,21 @@ public class MainActivity extends AppCompatActivity {
             dataBase.getCopies();
         }
 
-        WorkManager workManager = WorkManager.getInstance(this);
+
         // application singleton
         CalculateRootsApplication application = (CalculateRootsApplication) getApplication();
-        /**
+
         dataBase.publicLiveData.observe(this, new Observer<List<CalculationItem>>() {
             @Override
-            public void onChanged(List<TodoItem> todoItems) {
-                if(todoItems.size() == 0){
-                    adapter.addTodoListToAdapter(new ArrayList<>());
+            public void onChanged(List<CalculationItem> items) {
+                if(items.size() == 0){
+                    adapter.addCalculationListToAdapter(new ArrayList<>());
                 }
                 else{
-                    adapter.addTodoListToAdapter(new ArrayList<>(todoItems));
-                    //adapter.notifyDataSetChanged();
+                    adapter.addCalculationListToAdapter(new ArrayList<>(items));
                 }
             }
-        });*/
+        });
 
         if (holder == null) {
             holder = new CalculationItemsHolder(recyclerView);
@@ -104,14 +106,65 @@ public class MainActivity extends AppCompatActivity {
             // add to the adapter
             // If the text isn't empty, creates a new calculation object
             if (!userInputString.equals("")){
-                dataBase.addItem(userInputString, "IN_PROGRESS");
+                String state = "new";
+
+                CalculationItem item = new CalculationItem(request.getId(), userInputString, state);
+                dataBase.addItem(item);
+
                 ArrayList<CalculationItem> list = dataBase.getCopies();
                 adapter.addCalculationListToAdapter(list);
                 adapter.notifyDataSetChanged();
                 textInsertTask.setText("");
+
+                // listen to the current item's work information
+                observeCalculationItemWork(item);
             }
         });
 
+    } // end of on create
+
+    // listen to work information
+    private void observeCalculationItemWork(CalculationItem item){
+        UUID workId = item.getId();
+        workManager.getWorkInfoByIdLiveData(workId).observe(this, new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                if (workInfo.getState().equals(WorkInfo.State.SUCCEEDED)){
+                    Data outputData = workInfo.getOutputData();
+                    String is_prime = outputData.getString("is_prime");
+
+                    // todo handle is_prime
+                    // If the number isn't prime, show it's roots in roots text view
+                    if (is_prime.equals("false")) {
+                        long first_root = outputData.getLong("first_root", -1);
+                        long second_root = outputData.getLong("second_root", -1);
+                        Pair<Long, Long> roots = new Pair<>(first_root, second_root);
+                        item.setRoots(roots);
+                        item.setStatus("done");
+
+                       // String rootsStr = outputData.getString("roots");
+                      //  if (!rootsStr.equals("")) {
+                         //   String[] split = rootsStr.split(",");
+                         //   String firstRoot = split[0];
+                         //   String secondRoot = split[1];
+
+                         //   TextView rootsTextView = findViewById(R.id.rootsTextView);
+                           // rootsTextView.setText(firstRoot + " * " + secondRoot);
+                    }
+                    else if (is_prime.equals("true")){
+                        TextView rootsTextView = findViewById(R.id.rootsTextView);
+                        rootsTextView.setText("number is prime");
+                    }
+                }
+                // update progress bar
+                else if (workInfo.getState().equals(WorkInfo.State.RUNNING)){
+                    Integer progress = workInfo.getProgress().getInt("progress", 0);
+                    item.setProgress(progress);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
         // listen to work information
         /**
         LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(application.getWorkerId());
@@ -141,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-         */
+
         LiveData<List<WorkInfo>> workers_interesting = workManager.getWorkInfosByTagLiveData("new_work");
         workers_interesting.observe(this, new Observer<List<WorkInfo>>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -152,8 +205,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+ */
 
-    } // end of on create
 }
 
 /**

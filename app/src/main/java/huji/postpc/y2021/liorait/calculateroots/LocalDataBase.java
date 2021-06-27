@@ -50,10 +50,10 @@ public class LocalDataBase {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void addItem(String number, String state){
-        String newId = UUID.randomUUID().toString();
-        CalculationItem newItem = new CalculationItem(newId, number, state);
-        items.add(0, newItem);
+    public void addItem(CalculationItem item){
+       // String newId = UUID.randomUUID().toString();
+       // CalculationItem newItem = new CalculationItem(newId, number, state);
+        items.add(0, item);
         //sortItems();
 
         // update sp of the changes
