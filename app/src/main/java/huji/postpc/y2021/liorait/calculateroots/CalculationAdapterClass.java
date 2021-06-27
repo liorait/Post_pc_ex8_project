@@ -19,6 +19,12 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         this.mContext = context;
     }
 
+    public void addCalculationListToAdapter(ArrayList<CalculationItem> newList){
+        this.list.clear();
+        this.list.addAll(newList);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public CalculationItemsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -30,7 +36,15 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CalculationItemsHolder holder, int position) {}
+    public void onBindViewHolder(@NonNull CalculationItemsHolder holder, int position) {
+        CalculationItem item = this.list.get(position);
+        holder.numberText.setText(item.getNumber());
+        holder.cancelButton.setEnabled(true);
+        holder.deleteButton.setEnabled(false);
+        holder.deleteButton.setVisibility(View.GONE);
+        holder.cancelButton.setVisibility(View.VISIBLE);
+        holder.progressBar.setVisibility(View.VISIBLE);
+    }
 
     @Override
     // return number of calculation items holders
