@@ -20,18 +20,23 @@ public class Work extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        long start = getInputData().getLong("start",200);
+        long total = start;
         // this code runs asyncronically on a background thread
         // todo here calculate roots
-        for (int i = 0; i < 1000000; i++){
-            Log.d("tag" ,  "" +i);
 
-            // Send status updates
-            this.setProgressAsync(
-                    new Data.Builder().putLong("current", i).putLong("total",10000).build()
-            );
+        for (int i = 0; i < total; i++){
+         //   for (int j = 0; j < 100; j++) {
+                Log.wtf("count work tag", "" + i);
+
+                // Send status updates
+                this.setProgressAsync(
+                        new Data.Builder().putLong("current", i).putLong("total", total).build()
+                );
+          // }
         }
 
-        return Result.success(new Data.Builder().putLong("counted", 1000L).build());
+        return Result.success(new Data.Builder().putLong("counted", 100000000L).build());
         // todo return Result.success/retry/failure
     }
 }

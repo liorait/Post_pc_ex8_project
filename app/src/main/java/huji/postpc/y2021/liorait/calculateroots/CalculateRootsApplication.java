@@ -19,16 +19,21 @@ public class CalculateRootsApplication extends Application {
 
         // singleton of work manager
         androidx.work.WorkManager workManager = androidx.work.WorkManager.getInstance(this);
-      //  workManager.cancelAllWork();
+        // If not canceling the work continues to re-run
+       // workManager.cancelAllWork();
         Constraints.Builder constraintsBuilder = new Constraints.Builder();
 
-        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(Work.class).addTag("request")
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(Work.class)
+                .setInputData(new Data.Builder().putLong("start", 300).build()).addTag("request")
                 .setConstraints(constraintsBuilder.build()).setInitialDelay(20, TimeUnit.MILLISECONDS).build();
 
         id = request.getId();
 
         // add a work to list
-         workManager.enqueue(request);
+     //    workManager.enqueue(request);
+
+        // If exists, replace
+         workManager.enqueueUniqueWork("count-worker", ExistingWorkPolicy.REPLACE, request);
 
         // listen to work manager status
         LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(id);

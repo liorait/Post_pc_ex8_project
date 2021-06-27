@@ -3,6 +3,7 @@ package huji.postpc.y2021.liorait.calculateroots;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -14,10 +15,22 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+   // public CalculationHolder holder = null;
+    public CalculationAdapterClass adapter = null;
+    public LocalDataBase dataBase = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerCalculationItemsList); // finds the recycler view
+        adapter = new CalculationAdapterClass(this);
+
+        if (dataBase == null){
+          //  dataBase = ToDoItemsApplication.getInstance().getDataBase();
+           // dataBase.getCopies();
+        }
 
         WorkManager workManager = WorkManager.getInstance(this);
         // application singleton
@@ -33,13 +46,14 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("work state: " ,""+ workInfo);
                 Data progress = workInfo.getProgress();
                 long current = progress.getLong("current", -1);
-                long counted = progress.getLong("counted", -1);
+                long total = progress.getLong("total", -1);
 
                 if (current != -1){
                     // update in UI
-                    Log.d("progress", "current" + current + "of" + counted);
+                    Log.wtf("progress", "current" + current + "of" + total);
+                    System.out.println("current" + current + "of" + total);
                     TextView t = findViewById(R.id.textView);
-                    String s = "current" + current + "of" + counted;
+                    String s = "current " + current + " of " + total;
                     t.setText(s);
                 }
 
@@ -55,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
 /**
  * todo
- * set view holder
- * set adapter
+ * set view holder - done
+ * set adapter - done
+ * create adapter class
  * create layout for row (cancel)
  * create layout for main activity
  * create layout for add calculation activity
