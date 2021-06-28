@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("error", "could not convert String to Long");
                 return;
             }
-            workManager.cancelAllWork();
+            //workManager.cancelAllWork();
 
             // create new worker
             OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(Work.class)

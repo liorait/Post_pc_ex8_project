@@ -38,10 +38,6 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         return new CalculationItemsHolder(view);
     }
 
-    //private void setProgress(int progress, CalculationItemsHolder holder){
-
-   // }
-
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull CalculationItemsHolder holder, int position) {
@@ -60,17 +56,17 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
       //  setProgress(item.getProgress(), holder);
         holder.setProgress(item.getProgress());
 
-        if (item.getStatus().equals("done")) {
-            Pair<Long, Long> roots = item.getRoots();
-            if (roots != null) {
-                String firstRoot = roots.first.toString();
-                String secondRoot = roots.second.toString();
-                holder.rootsTextView.setText(firstRoot + " * " + secondRoot);
-            }
-            else{
-                holder.rootsTextView.setText("number is prime");
-            }
+       // if (item.getStatus().equals("done")) {
+        Pair<Long, Long> roots = item.getRoots();
+        if (roots != null) {
+            String firstRoot = roots.first.toString();
+            String secondRoot = roots.second.toString();
+            holder.rootsTextView.setText(firstRoot + " * " + secondRoot);
         }
+        else{
+            holder.rootsTextView.setText("number is prime");
+        }
+       // }
     }
 
     @Override

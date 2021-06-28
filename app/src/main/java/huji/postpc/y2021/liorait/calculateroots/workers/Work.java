@@ -1,6 +1,8 @@
 package huji.postpc.y2021.liorait.calculateroots.workers;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.drawable.shapes.Shape;
 import android.util.Log;
 import android.util.Pair;
 
@@ -11,9 +13,15 @@ import androidx.work.WorkerParameters;
 
 import java.util.Date;
 
+import huji.postpc.y2021.liorait.calculateroots.CalculateRootsApplication;
+
 public class Work extends Worker {
     private Integer progress;
     private Integer total = 100;
+    private SharedPreferences workSp;
+    private boolean isDone;
+    private long beginTime;
+    private boolean isRetry = false;
     // declares work
 
     public Work(@NonNull Context context, @NonNull WorkerParameters parameters){
@@ -21,84 +29,99 @@ public class Work extends Worker {
         progress = 0;
         // Send status updates
         this.setProgressAsync(new Data.Builder().putInt("progress", progress).putInt("total", total).build());
+        CalculateRootsApplication application = CalculateRootsApplication.getInstance();
+        workSp = application.getWorkSp();
+        this.isDone = false;
+        this.beginTime = System.currentTimeMillis();
 
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        Long numberToCalculateRootsFor = getInputData().getLong("number", 1);
-        Pair<Long, Long> roots = calculateRoots(numberToCalculateRootsFor);
-        if (roots == null){
-            String number = Long.toString(numberToCalculateRootsFor);
-            String rootsStr = " " + "1" + "," + number;
-            return Result.success(new Data.Builder().putString("is_prime", "true")
-                    .putLong("first_root", 1)
-                    .putLong("second_root", numberToCalculateRootsFor).build());
-                  //  .putString("roots", rootsStr).build());
 
+        long numberToCalculateRootsFor = getInputData().getLong("number", -1);
+
+        if (numberToCalculateRootsFor == -1){
+            return Result.failure();
+        }
+
+        Pair<Long, Long> roots = calculateRoots(numberToCalculateRootsFor);
+
+        // If couldn't find roots, the number is prime or the work has stopped
+        if (roots == null){
+            if (this.isRetry){
+                return Result.retry();
+            }
+            if (this.isDone) {
+                return Result.success(new Data.Builder().putString("is_prime", "true")
+                        .putLong("first_root", 1)
+                        .putLong("second_root", numberToCalculateRootsFor).build());
+            }
+            else{
+                // work stopped
+                Log.i("stopped", "work_stopped");
+                return Result.failure();
+            }
         }
         else{
-           // String rootsStr = " " + roots.first.toString() + "," + roots.second.toString();
             return Result.success(new Data.Builder().putString("is_prime", "false")
                     .putLong("first_root", roots.first)
                     .putLong("second_root", roots.second).build());
-                 //   .putString("roots", rootsStr).build());
         }
-
-
-        /**
-        long start = getInputData().getLong("start",200);
-        long total = start;
-        // this code runs asyncronically on a background thread
-        // todo here calculate roots
-
-        for (int i = 0; i < total; i++){
-         //   for (int j = 0; j < 100; j++) {
-                Log.wtf("count work tag", "" + i);
-
-                // Send status updates
-                this.setProgressAsync(
-                        new Data.Builder().putLong("current", i).putLong("total", total).build()
-                );
-          // }
-        }
-*/
-       // return Result.success(new Data.Builder().putLong("counted", 100000000L).build());
-        // todo return Result.success/retry/failure
-
     }
 
     private Pair<Long, Long> calculateRoots(long numberToCalculateRootsFor){
            // long timeStartMs = System.currentTimeMillis();
             //long endTime = timeStartMs + 20000L;
 
-        int i = 2;
-        long total = numberToCalculateRootsFor / 2;
-        while (i <= total){
-          //  Integer currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor/2.0)) * 100);
-           // int currentProgress = (int)(Math.ceil((i / (numberToCalculateRootsFor/2.0))*100));
-            //if (newProgress != progress){
-          //  progress = currentProgress;
-            if (i%4 == 0){
-                int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor/2.0)) * 100);
-                this.setProgressAsync(new Data.Builder().putInt("progress",  currentProgress).build());
-            }
-            //this.setProgressAsync(new Data.Builder().putInt("progress",  currentProgress).build());
-            //}
+        long i = workSp.getLong("reached_calculation_number" + numberToCalculateRootsFor, 2);
+        long total = (long) Math.sqrt(numberToCalculateRootsFor);
 
-            long root = (long) (numberToCalculateRootsFor / i);
-            if (numberToCalculateRootsFor % i == 0) {
-                Long j = (long) (numberToCalculateRootsFor / root);
-                Pair<Long, Long> newPair = new Pair<>(j, root);
-               // isFinishedCalculation = true;
-                return newPair;
-            }i++;
-          //  currentTimeAfter = System.currentTimeMillis();
+        while (i <= total){
+            if (this.isStopped()){
+
+                // Save current number reached to
+                SharedPreferences.Editor editor = workSp.edit();
+                editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                editor.apply();
+                this.isDone = false;
+                return null;
+            }
+            else {
+
+                if (i % 4 == 0) {
+                    int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
+                    this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
+                }
+                long timeout = 540000L;
+                if (System.currentTimeMillis() - beginTime > timeout){
+
+                    // Save current number reached to
+                    SharedPreferences.Editor editor = workSp.edit();
+                    editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                    editor.apply();
+                    isRetry = true;
+                    return null;
+                }
+
+                long root = (long) (numberToCalculateRootsFor / i);
+                if (numberToCalculateRootsFor % i == 0) {
+                    Long j = (long) (numberToCalculateRootsFor / root);
+                    Pair<Long, Long> newPair = new Pair<>(j, root);
+
+                    SharedPreferences.Editor editor = workSp.edit();
+                    editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                    editor.apply();
+
+                    this.isDone = true;
+                    return newPair;
+                }
+                i++;
+            }
         }
+
+        this.isDone = true;
         return null;
-        // If roots were not found, prime number
-      //  Pair<Long, Long> pair = new Pair<>(1, numberToCalculateRootsFor);
-       // return pair;
     }
 }
