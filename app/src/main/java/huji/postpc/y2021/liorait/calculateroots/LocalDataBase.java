@@ -3,7 +3,9 @@ package huji.postpc.y2021.liorait.calculateroots;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Pair;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -49,6 +51,45 @@ public class LocalDataBase {
         return new ArrayList<>(items);
     }
 
+    public void editProgress(UUID id, int progress){
+     //   CalculationItem oldItem = this.items.get(id);
+
+       // this.items.remove(id);
+    }
+
+    public void deleteSp(){
+        SharedPreferences.Editor editor = sp.edit();
+        editor.clear(); // remove the key
+        editor.apply();
+        mutableLiveData.setValue(new ArrayList<>(items));
+    }
+
+    public void updateRoots(CalculationItem item, Pair<Long, Long> roots){
+        String id = item.getId();
+        CalculationItem old = getById(id);
+        CalculationItem newItem = new CalculationItem(old.getId(), old.getNumber(), old.getStatus());
+        newItem.setRoots(roots);
+        newItem.setProgress(old.getProgress());
+        newItem.setIsPrime(old.getIsPrime());
+        this.items.remove(old);
+        this.items.add(newItem);
+
+        // update sp
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(item.getId(), item.itemStringRepresentation());
+        editor.apply();
+    }
+
+    public @Nullable CalculationItem getById(String id){
+        if (id == null) return null;
+        for (CalculationItem item : items){
+            if (item.getId().equals(id)){
+                return item;
+            }
+        }
+        return null;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void addItem(CalculationItem item){
        // String newId = UUID.randomUUID().toString();
@@ -62,7 +103,7 @@ public class LocalDataBase {
       //  editor.apply();
         // update sp of the changes
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(item.getId().toString(), item.itemStringRepresentation());
+        editor.putString(item.getId(), item.itemStringRepresentation());
         editor.apply();
 
         // update the live data of the changed

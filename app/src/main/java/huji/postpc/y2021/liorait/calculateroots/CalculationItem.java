@@ -2,22 +2,20 @@ package huji.postpc.y2021.liorait.calculateroots;
 
 import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.UUID;
 
 public class CalculationItem implements Serializable {
     private long number;
     private String status;
-    private UUID itemId;
+    private String itemId;
     private boolean isPrime;
     private int progress;
     private int total_progress;
     private Pair<Long, Long> roots;
 
-    public CalculationItem(UUID id, long number, String status) {
+    public CalculationItem(String id, long number, String status) {
         this.number = number;
         this.status = status;
         this.itemId = id;
@@ -25,6 +23,15 @@ public class CalculationItem implements Serializable {
         this.roots = null;
         this.total_progress = 100;
     }
+
+    public void setIsPrime(boolean prime) {
+        this.isPrime = prime;
+    }
+
+    public boolean getIsPrime() {
+        return this.isPrime;
+    }
+
 
     public void setStatus(String status) {
         this.status = status;
@@ -34,7 +41,7 @@ public class CalculationItem implements Serializable {
         this.number = number;
     }
 
-    public UUID getId() {
+    public String getId() {
         return itemId;
     }
 
@@ -46,7 +53,7 @@ public class CalculationItem implements Serializable {
         return status;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.itemId = id;
     }
 
@@ -70,16 +77,31 @@ public class CalculationItem implements Serializable {
         String rootsRepr = "";
         if (roots == null){rootsRepr="None";}
         else {
-            String rootsStr = roots.first.toString() + "!" + roots.second.toString();
+            rootsRepr = roots.first.toString() + "!" + roots.second.toString();
         }
         String numberStr = Long.toString(this.number);
         String prime = "";
         if (isPrime){prime="true";}else{prime="false";}
 
-        String repr = numberStr + "/" + this.status + "/" + this.itemId.toString() + "/" +
+        String repr = numberStr + "/" + this.status + "/" + this.itemId + "/" +
         prime + "/" + Integer.toString(progress) + "/" + Integer.toString(total_progress) + "/" + rootsRepr;
 
         return repr;
+    }
+
+    public String getRootsAsString(){
+        String rootsStr = "";
+
+        //Pair<Long, Long> roots = this.getRoots();
+        if (this.roots != null) {
+            String firstRoot = roots.first.toString();
+            String secondRoot = roots.second.toString();
+            return firstRoot + " * " + secondRoot;
+        }
+        else if ((roots == null) && (this.isPrime)){
+             return "number is prime";
+        }
+        return "calculating roots..";
     }
 
     static protected CalculationItem stringToCalculationItem(String stringRepr) {
@@ -106,7 +128,7 @@ public class CalculationItem implements Serializable {
             }
 
             // parse string to UUID
-            UUID id = UUID.fromString(itemId);
+            //UUID id = UUID.fromString(itemId);
             boolean prime = false;
             if (isPrime.equals("true")) {
                 prime = true;
@@ -116,7 +138,7 @@ public class CalculationItem implements Serializable {
             int totalProgressInt = Integer.parseInt(total);
 
             // create a new item
-            CalculationItem newItem = new CalculationItem(id, userInputLong, status);
+            CalculationItem newItem = new CalculationItem(itemId, userInputLong, status);
             newItem.isPrime = prime; // todo setter
             newItem.progress = progressInt;
             newItem.total_progress = totalProgressInt;

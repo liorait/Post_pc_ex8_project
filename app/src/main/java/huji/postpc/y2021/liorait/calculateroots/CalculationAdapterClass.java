@@ -2,6 +2,7 @@ package huji.postpc.y2021.liorait.calculateroots;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +10,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationItemsHolder> {
     private final ArrayList<CalculationItem> list;
     private Context mContext;
+    WorkManager workManager = WorkManager.getInstance(mContext);
 
     public CalculationAdapterClass(Context context){
         this.list = new ArrayList<>();
@@ -45,7 +54,6 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         long number = item.getNumber();
         String numberStr = Long.toString(number);
         holder.numberText.setText(numberStr);
-
         holder.cancelButton.setEnabled(true);
         holder.deleteButton.setEnabled(false);
         holder.deleteButton.setVisibility(View.GONE);
@@ -55,7 +63,21 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
        // holder.progressBar.setProgress(item.getProgress());
       //  setProgress(item.getProgress(), holder);
         holder.setProgress(item.getProgress());
+        holder.rootsTextView.setText(item.getRootsAsString());
+        UUID id = UUID.fromString(item.getId());
 
+        LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(id);
+        workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
+            @Override
+            public void onChanged(WorkInfo workInfo) {
+                WorkInfo.State state = workInfo.getState();
+                holder.rootsTextView.setText(item.getRootsAsString());
+                holder.setProgress(item.getProgress());
+                System.out.println("state of " + id.toString()+ "is " + state );
+            }
+        });
+
+        /**
        // if (item.getStatus().equals("done")) {
         Pair<Long, Long> roots = item.getRoots();
         if (roots != null) {
@@ -63,10 +85,13 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
             String secondRoot = roots.second.toString();
             holder.rootsTextView.setText(firstRoot + " * " + secondRoot);
         }
-        else{
+        else if ((roots == null) && (item.getIsPrime())){
             holder.rootsTextView.setText("number is prime");
         }
+        //else{
+//            holder.setProgress(item.getProgress());
        // }
+         */
     }
 
     @Override

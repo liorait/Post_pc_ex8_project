@@ -29,7 +29,7 @@ public class Work extends Worker {
         progress = 0;
         // Send status updates
         this.setProgressAsync(new Data.Builder().putInt("progress", progress).putInt("total", total).build());
-        CalculateRootsApplication application = CalculateRootsApplication.getInstance();
+        CalculateRootsApplication application = (CalculateRootsApplication) getApplicationContext();
         workSp = application.getWorkSp();
         this.isDone = false;
         this.beginTime = System.currentTimeMillis();
@@ -90,7 +90,7 @@ public class Work extends Worker {
             }
             else {
 
-                if (i % 4 == 0) {
+                if (i % 2 == 0) {
                     int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
                     this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
                 }
