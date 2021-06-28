@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("error", "could not convert String to Long");
                 return;
             }
+            workManager.cancelAllWork();
 
             // create new worker
             OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(Work.class)
@@ -102,6 +103,17 @@ public class MainActivity extends AppCompatActivity {
 
            // workManager.enqueueUniqueWork()
             workManager.enqueue(request);
+            UUID requesId = request.getId();
+            // live data of the status of the worker
+            LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(requesId);
+            workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
+                @Override
+                public void onChanged(WorkInfo workInfo) {
+                    WorkInfo.State state = workInfo.getState();
+                    System.out.println("state of " + requesId.toString()+ "is " + state );
+                }
+            });
+
 
             // add to the adapter
             // If the text isn't empty, creates a new calculation object

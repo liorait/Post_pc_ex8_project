@@ -25,16 +25,15 @@ public class LocalDataBase {
         this.context = context;
         //sortItems(); // todo
         this.sp = context.getSharedPreferences("local_db_calculation_items", Context.MODE_PRIVATE);
-     //   initializeSp();
+        initializeSp();
     }
 
     // initialize the shared preferences
-    /**
     private void initializeSp(){
         Set<String> keys = sp.getAll().keySet();
         for (String key: keys){
             String stringRepr = sp.getString(key, null);
-            CalculationItem item = CalculationItem.stringToToDoItem(stringRepr);
+            CalculationItem item = CalculationItem.stringToCalculationItem(stringRepr);
             if (item != null){
                 items.add(item);
             }
@@ -42,7 +41,8 @@ public class LocalDataBase {
         // update the live data about the changes
         mutableLiveData.setValue(new ArrayList<>(items));
     }
-     */
+
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public ArrayList<CalculationItem> getCopies(){
         //sortItems();
@@ -60,9 +60,16 @@ public class LocalDataBase {
       //  SharedPreferences.Editor editor = sp.edit();
        // editor.putString(newItem.getId(), newItem.itemStringRepresentation());
       //  editor.apply();
+        // update sp of the changes
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(item.getId().toString(), item.itemStringRepresentation());
+        editor.apply();
 
         // update the live data of the changed
         mutableLiveData.setValue(new ArrayList<>(items));
+      //  sendBroadcastDbChanged(); // send broadcast
+        // update the live data of the changed
+      //  mutableLiveData.setValue(new ArrayList<>(items));
       //  sendBroadcastDbChanged(); // send broadcast
     }
 
