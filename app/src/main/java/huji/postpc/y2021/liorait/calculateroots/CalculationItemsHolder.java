@@ -32,4 +32,19 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
     public ArrayList<CalculationItem> getCurrentItems() {
         return this.calculationsList;
     }
+
+    public void setProgress(int progress){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Thread.sleep(1000);
+                }catch(InterruptedException e){
+                    e.printStackTrace();
+                }
+                setProgress(progress + 10);
+            }
+        });
+        thread.start();
+    }
 }

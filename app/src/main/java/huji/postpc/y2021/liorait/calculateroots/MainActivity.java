@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             if (!userInputString.equals("")){
                 String state = "new";
 
-                CalculationItem item = new CalculationItem(request.getId(), userInputString, state);
+                CalculationItem item = new CalculationItem(request.getId(), userInputLong, state);
                 dataBase.addItem(item);
 
                 ArrayList<CalculationItem> list = dataBase.getCopies();
@@ -162,11 +162,16 @@ public class MainActivity extends AppCompatActivity {
                 // update progress bar
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)){
                     int progress = workInfo.getProgress().getInt("progress", 0);
+                  //  setProgressForItem(progress);
                     item.setProgress(progress);
                     adapter.notifyDataSetChanged();
                 }
             }
         });
+    }
+
+    private void setProgressForItem(int progress){
+
     }
         // listen to work information
         /**

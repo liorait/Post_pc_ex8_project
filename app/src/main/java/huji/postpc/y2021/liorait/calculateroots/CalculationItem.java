@@ -6,26 +6,28 @@ import java.util.Date;
 import java.util.UUID;
 
 public class CalculationItem {
-    private String number;
+    private long number;
     private String status;
     private UUID itemId;
     private boolean isPrime;
     private int progress;
+    private int total_progress;
     private Pair<Long, Long> roots;
 
-    public CalculationItem(UUID id, String number, String status) {
+    public CalculationItem(UUID id, long number, String status) {
         this.number = number;
         this.status = status;
         this.itemId = id;
         this.isPrime = false;
         this.roots = null;
+        this.total_progress = 100;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
 
-    public void setNumber(String desc) {
+    public void setNumber(long number) {
         this.number = number;
     }
 
@@ -33,7 +35,7 @@ public class CalculationItem {
         return itemId;
     }
 
-    public String getNumber() {
+    public long getNumber() {
         return number;
     }
 

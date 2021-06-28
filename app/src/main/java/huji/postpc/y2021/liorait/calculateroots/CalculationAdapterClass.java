@@ -38,17 +38,27 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         return new CalculationItemsHolder(view);
     }
 
+    //private void setProgress(int progress, CalculationItemsHolder holder){
+
+   // }
+
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull CalculationItemsHolder holder, int position) {
         CalculationItem item = this.list.get(position);
-        holder.numberText.setText(item.getNumber());
+        long number = item.getNumber();
+        String numberStr = Long.toString(number);
+        holder.numberText.setText(numberStr);
+
         holder.cancelButton.setEnabled(true);
         holder.deleteButton.setEnabled(false);
         holder.deleteButton.setVisibility(View.GONE);
         holder.cancelButton.setVisibility(View.VISIBLE);
         holder.progressBar.setVisibility(View.VISIBLE);
-        holder.progressBar.setProgress(item.getProgress());
+
+       // holder.progressBar.setProgress(item.getProgress());
+      //  setProgress(item.getProgress(), holder);
+        holder.setProgress(item.getProgress());
 
         if (item.getStatus().equals("done")) {
             Pair<Long, Long> roots = item.getRoots();

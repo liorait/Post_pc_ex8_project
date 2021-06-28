@@ -74,9 +74,10 @@ public class Work extends Worker {
             //long endTime = timeStartMs + 20000L;
 
         int i = 2;
-
-        while (i <= numberToCalculateRootsFor / 2){
+        long total = numberToCalculateRootsFor / 2;
+        while (i <= total){
           //  Integer currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor/2.0)) * 100);
+           // int currentProgress = (int)(Math.ceil((i / (numberToCalculateRootsFor/2.0))*100));
             //if (newProgress != progress){
           //  progress = currentProgress;
             if (i%4 == 0){
