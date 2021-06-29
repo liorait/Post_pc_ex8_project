@@ -1,5 +1,6 @@
 package huji.postpc.y2021.liorait.calculateroots;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         if (dataBase == null){
             dataBase = CalculateRootsApplication.getInstance().getDataBase();
         }
-       // dataBase.deleteSp();// todo delete
+      //  dataBase.deleteSp();// todo delete
 
         // application singleton
         CalculateRootsApplication application = (CalculateRootsApplication) getApplication();
@@ -100,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Adds a new calculation item
         buttonAddToDoItem.setOnClickListener(v -> {
+
             String userInputString = textInsertTask.getText().toString();
 
             long userInputLong = parseStringToLong(userInputString);
@@ -200,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                         Pair<Long, Long> roots = new Pair<>(first_root, second_root);
                         item.setRoots(roots);
                        // item.setStatus("done");
-                       // dataBase.updateRoots(item, roots);
+                        dataBase.updateRoots(item, roots);
                         adapter.notifyDataSetChanged();
                     }
                     else if (is_prime.equals("true")){
@@ -228,48 +232,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-        // listen to work information
-        /**
-        LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(application.getWorkerId());
+    // flip screen
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("saved_state", holder.saveState());
+    }
 
-        workInfoByIdLiveData.observe(this, new Observer<WorkInfo>() {
-            @Override
-            public void onChanged(WorkInfo workInfo) {
-
-                Log.d("work state: " ,""+ workInfo);
-                Data progress = workInfo.getProgress();
-                long current = progress.getLong("current", -1);
-                long total = progress.getLong("total", -1);
-
-                if (current != -1){
-                    // update in UI
-                    Log.wtf("progress", "current" + current + "of" + total);
-                    System.out.println("current" + current + "of" + total);
-                    TextView t = findViewById(R.id.textView);
-                    String s = "current " + current + " of " + total;
-                    t.setText(s);
-                }
-
-                if (workInfo.getState().equals(WorkInfo.State.SUCCEEDED)){
-                    Data outputData = workInfo.getOutputData();
-                    long val = outputData.getLong("counted", -1);
-                    Log.d("Activity", "counted " + val);
-                }
-            }
-        });
-
-        LiveData<List<WorkInfo>> workers_interesting = workManager.getWorkInfosByTagLiveData("new_work");
-        workers_interesting.observe(this, new Observer<List<WorkInfo>>() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onChanged(List<WorkInfo> workInfos) {
-                for (WorkInfo w : workInfos){
-                   // if (w.getState().equals(WorkInfo.State.RUNNING)){}
-                }
-            }
-        });
- */
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Serializable saved_output = savedInstanceState.getSerializable("saved_state");
+        holder.loadState(saved_output);
+        adapter.addCalculationListToAdapter(dataBase.getCopies());
+    }
 }
 
 /**

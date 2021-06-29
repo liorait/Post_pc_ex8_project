@@ -51,6 +51,27 @@ public class LocalDataBase {
         //sortItems();
         return new ArrayList<>(items);
     }
+/**
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void markAsInProgress(String itemId){
+        TodoItem newItem = null;
+        for (TodoItem item : items){
+            if (item.getId().equals(itemId)){
+                newItem = new TodoItem(item.getId(), item.getDescription(), item.getStatus());
+                newItem.setStatus("IN_PROGRESS");
+                newItem.setCreatedDate(item.getCreatedDateAsDate());
+                items.add(0, newItem);
+                items.remove(item);
+                break;
+            }
+        }
+        sortItems();
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(newItem.getId(), newItem.itemStringRepresentation());
+        editor.apply();
+        mutableLiveData.setValue(new ArrayList<>(items));
+        sendBroadcastDbChanged();
+    }*/
 
     public void editProgress(UUID id, int progress){
      //   CalculationItem oldItem = this.items.get(id);

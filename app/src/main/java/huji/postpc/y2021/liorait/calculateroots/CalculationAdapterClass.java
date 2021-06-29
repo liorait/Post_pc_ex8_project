@@ -132,6 +132,12 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
 
         holder.cancelButton.setOnClickListener(v -> {
             cancelListener.onCancelClick(item);
+
+            holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
+            holder.cancelButton.setEnabled(false);
+
+            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setEnabled(true);
         });
 
 
