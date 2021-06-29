@@ -28,8 +28,6 @@ public class CalculateRootsApplication extends Application {
         return instance;
     }
 
-    // todo create a list of workers and add tag for each
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate() {
@@ -75,7 +73,4 @@ public class CalculateRootsApplication extends Application {
     public SharedPreferences getWorkSp() {
         return sp;
     }
-
-
-
 }

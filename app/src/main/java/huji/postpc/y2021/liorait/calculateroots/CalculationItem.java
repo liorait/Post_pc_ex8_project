@@ -75,7 +75,14 @@ public class CalculationItem implements Serializable {
 
     protected String itemStringRepresentation() {
         String rootsRepr = "";
-        if (roots == null){rootsRepr="None";}
+        if (roots == null) {
+            if (isPrime){
+                rootsRepr = "number is prime";
+            }
+            else{
+                rootsRepr = "calculating roots..";
+            }
+        }
         else {
             rootsRepr = roots.first.toString() + "!" + roots.second.toString();
         }
@@ -143,7 +150,7 @@ public class CalculationItem implements Serializable {
             newItem.progress = progressInt;
             newItem.total_progress = totalProgressInt;
 
-            if (rootsRepr.equals("None")) {
+            if (rootsRepr.equals("number is prime") || (rootsRepr.equals("calculating roots.."))) {
                 newItem.roots = null;
             }
             else{

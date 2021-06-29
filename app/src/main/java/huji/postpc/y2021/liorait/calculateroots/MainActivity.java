@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     public CalculationItemsHolder holder = null;
     public CalculationAdapterClass adapter = null;
     public LocalDataBase dataBase = null;
-    WorkManager workManager = WorkManager.getInstance(this);
+    String NEW = "new";
+    WorkManager workManager = WorkManager.getInstance(this); // gets the work manager singleton
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -47,9 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (dataBase == null){
             dataBase = CalculateRootsApplication.getInstance().getDataBase();
-            dataBase.getCopies();
         }
-       // dataBase.deleteSp();
+       // dataBase.deleteSp();// todo delete
 
         // application singleton
         CalculateRootsApplication application = (CalculateRootsApplication) getApplication();
@@ -81,9 +81,34 @@ public class MainActivity extends AppCompatActivity {
         EditText textInsertTask = findViewById(R.id.editTextInsertTask);
         FloatingActionButton buttonAddToDoItem = findViewById(R.id.buttonCreateNewCalculation);
 
+        adapter.setDeleteListener(new CalculationAdapterClass.DeleteClickListener() {
+            public void onDeleteClick(CalculationItem item) {
+                dataBase.deleteItem(item.getId());
+                //adapter.addCalculationListToAdapter(dataBase.getCopies());
+            }
+        });
+
+        adapter.setCancelListener(new CalculationAdapterClass.CancelClickListener() {
+            public void onCancelClick(CalculationItem item) {
+                //dataBase.deleteItem(item.getId());
+                UUID id = UUID.fromString(item.getId());
+                workManager.cancelWorkById(id);
+                //adapter.addCalculationListToAdapter(dataBase.getCopies());
+            }
+        });
+
+
+        // Adds a new calculation item
         buttonAddToDoItem.setOnClickListener(v -> {
             String userInputString = textInsertTask.getText().toString();
 
+            long userInputLong = parseStringToLong(userInputString);
+            if (userInputLong == -1)
+            {
+                Toast.makeText(this, "could not convert String to Long", Toast.LENGTH_SHORT).show();
+            }
+          //  System.out.println(userInputLong);
+            /**
             // parse string to long
             long userInputLong = 0;
             try {
@@ -94,12 +119,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("error", "could not convert String to Long");
                 return;
             }
-            workManager.cancelAllWork();
+             */
+           // workManager.cancelAllWork();// todo delete
 
             // add to the adapter
             // If the text isn't empty, creates a new calculation object
-            if (!userInputString.equals("")){
-                String state = "new";
+            if (!userInputString.equals("") && (userInputLong != -1)) {
 
                 // create new worker
                 OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(Work.class)
@@ -108,7 +133,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // workManager.enqueueUniqueWork()
                 workManager.enqueue(request);
+
                 UUID requesId = request.getId();
+
                 // live data of the status of the worker todo delete
                 LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(requesId);
                 workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
@@ -119,8 +146,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                CalculationItem item = new CalculationItem(request.getId().toString(), userInputLong, state);
-                dataBase.addItem(item);
+                CalculationItem item = new CalculationItem(request.getId().toString(), userInputLong, NEW);
+                dataBase.addItem(item); // Adds item to local db
 
                 ArrayList<CalculationItem> list = dataBase.getCopies();
                 adapter.addCalculationListToAdapter(list);
@@ -134,6 +161,22 @@ public class MainActivity extends AppCompatActivity {
 
     } // end of on create
 
+
+    private long parseStringToLong(String userInputString){
+
+        // parse string to long
+        long userInputLong = 0;
+        try {
+            userInputLong = Long.parseLong(userInputString);
+        }
+        catch (NumberFormatException e){
+            Toast.makeText(this, "could not convert String to Long", Toast.LENGTH_SHORT).show();
+            Log.e("error", "could not convert String to Long");
+            return -1;
+        }
+        return userInputLong;
+    }
+
     // listen to work information
     private void observeCalculationItemWork(CalculationItem item){
         UUID workId = UUID.fromString(item.getId());
@@ -145,24 +188,29 @@ public class MainActivity extends AppCompatActivity {
                     Data outputData = workInfo.getOutputData();
                     String is_prime = outputData.getString("is_prime");
 
-                    // todo handle is_prime
+                    item.setStatus("done");
+                  //  dataBase.updateStatus(item, "done");
+                    adapter.notifyDataSetChanged();
+                    item.setProgress(100);
+
                     // If the number isn't prime, show it's roots in roots text view
                     if (is_prime.equals("false")) {
                         long first_root = outputData.getLong("first_root", -1);
                         long second_root = outputData.getLong("second_root", -1);
                         Pair<Long, Long> roots = new Pair<>(first_root, second_root);
-                        System.out.println("found roots: " + first_root +" "+ second_root);
                         item.setRoots(roots);
-                        item.setStatus("done");
-                        dataBase.updateRoots(item, roots);
+                       // item.setStatus("done");
+                       // dataBase.updateRoots(item, roots);
                         adapter.notifyDataSetChanged();
                     }
                     else if (is_prime.equals("true")){
-                        TextView rootsTextView = findViewById(R.id.rootsTextView);
-                        rootsTextView.setText("number is prime");
-                        item.setStatus("done");
-                        ArrayList<CalculationItem> list = dataBase.getCopies();
-                        adapter.addCalculationListToAdapter(list);
+                        //TextView rootsTextView = findViewById(R.id.rootsTextView);
+                        //rootsTextView.setText("number is prime");
+                      //  item.setStatus("done");
+                        item.setRoots(null);
+                        item.setIsPrime(true);
+                       // ArrayList<CalculationItem> list = dataBase.getCopies();
+                       // adapter.addCalculationListToAdapter(list);
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -172,17 +220,14 @@ public class MainActivity extends AppCompatActivity {
                   //  setProgressForItem(progress);
                  //   dataBase.editProgress(item.getId(), progress);
                     item.setProgress(progress);
-                    ArrayList<CalculationItem> list = dataBase.getCopies();
-                    adapter.addCalculationListToAdapter(list);
+                   // ArrayList<CalculationItem> list = dataBase.getCopies();
+                  //  adapter.addCalculationListToAdapter(list);
                     adapter.notifyDataSetChanged();
                 }
             }
         });
     }
 
-    private void setProgressForItem(int progress){
-
-    }
         // listen to work information
         /**
         LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(application.getWorkerId());

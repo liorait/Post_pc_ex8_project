@@ -1,6 +1,7 @@
 package huji.postpc.y2021.liorait.calculateroots;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Pair;
@@ -108,10 +109,34 @@ public class LocalDataBase {
 
         // update the live data of the changed
         mutableLiveData.setValue(new ArrayList<>(items));
-      //  sendBroadcastDbChanged(); // send broadcast
-        // update the live data of the changed
-      //  mutableLiveData.setValue(new ArrayList<>(items));
-      //  sendBroadcastDbChanged(); // send broadcast
+        sendBroadcastDbChanged(); // send broadcast
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void deleteItem(String itemId){
+        CalculationItem toDelete = null;
+        for (CalculationItem item : items){
+            if (item.getId().equals(itemId)){
+                toDelete = item;
+                break;
+            }
+        }
+        if (toDelete != null){
+            items.remove(toDelete);
+        }
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove(toDelete.getId()); // remove the key
+        editor.apply();
+
+        mutableLiveData.setValue(new ArrayList<>(items));
+        sendBroadcastDbChanged();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void sendBroadcastDbChanged(){
+        Intent broadcast = new Intent("changed_db");
+        broadcast.putExtra("new_list", getCopies());
+        context.sendBroadcast(broadcast);
+    }
 }

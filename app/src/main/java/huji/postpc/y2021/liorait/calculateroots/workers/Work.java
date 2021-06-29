@@ -33,7 +33,6 @@ public class Work extends Worker {
         workSp = application.getWorkSp();
         this.isDone = false;
         this.beginTime = System.currentTimeMillis();
-
     }
 
     @NonNull
@@ -71,7 +70,7 @@ public class Work extends Worker {
         }
     }
 
-    private Pair<Long, Long> calculateRoots(long numberToCalculateRootsFor){
+    private Pair<Long, Long> calculateRoots(long numberToCalculateRootsFor) {
            // long timeStartMs = System.currentTimeMillis();
             //long endTime = timeStartMs + 20000L;
 
@@ -104,8 +103,14 @@ public class Work extends Worker {
                     isRetry = true;
                     return null;
                 }
+                if(i%3000L==0){
+                    SharedPreferences.Editor editor = workSp.edit();
+                    editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                    editor.apply();
+                }
 
                 long root = (long) (numberToCalculateRootsFor / i);
+
                 if (numberToCalculateRootsFor % i == 0) {
                     Long j = (long) (numberToCalculateRootsFor / root);
                     Pair<Long, Long> newPair = new Pair<>(j, root);
@@ -117,6 +122,15 @@ public class Work extends Worker {
                     this.isDone = true;
                     return newPair;
                 }
+                try {
+                    Thread.sleep(1000L); // todo need?
+                }
+                catch(InterruptedException e){
+
+                }
+                SharedPreferences.Editor editor = workSp.edit();
+                editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                editor.apply();
                 i++;
             }
         }

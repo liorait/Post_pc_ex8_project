@@ -1,6 +1,7 @@
 package huji.postpc.y2021.liorait.calculateroots;
 
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
     TextView cancelButton;
     TextView deleteButton;
     ProgressBar progressBar;
+    CheckBox isDoneCB;
 
     public CalculationItemsHolder(View view) {
         super(view);
@@ -27,6 +29,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
         cancelButton = view.findViewById(R.id.cancelButton);
         deleteButton = view.findViewById(R.id.deleteButton);
         progressBar = view.findViewById(R.id.progressBar);
+        isDoneCB = view.findViewById(R.id.checkBox);
     }
 
     public ArrayList<CalculationItem> getCurrentItems() {
@@ -38,7 +41,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
             @Override
             public void run() {
                 try{
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }

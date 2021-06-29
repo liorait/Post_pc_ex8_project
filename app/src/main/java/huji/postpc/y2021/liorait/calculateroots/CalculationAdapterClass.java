@@ -47,6 +47,27 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         return new CalculationItemsHolder(view);
     }
 
+    public DeleteClickListener deleteListener;
+    public CancelClickListener cancelListener;
+
+    // Create an interface
+    public interface DeleteClickListener{
+        void onDeleteClick(CalculationItem item);
+    }
+
+    // Create an interface
+    public interface CancelClickListener{
+        void onCancelClick(CalculationItem item);
+    }
+
+    public void setDeleteListener(DeleteClickListener listener){
+        this.deleteListener = listener;
+    }
+
+    public void setCancelListener(CancelClickListener listener){
+        this.cancelListener = listener;
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull CalculationItemsHolder holder, int position) {
@@ -59,23 +80,61 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         holder.deleteButton.setVisibility(View.GONE);
         holder.cancelButton.setVisibility(View.VISIBLE);
         holder.progressBar.setVisibility(View.VISIBLE);
+        holder.isDoneCB.setChecked(false);
 
-       // holder.progressBar.setProgress(item.getProgress());
+        holder.progressBar.setProgress(item.getProgress());
+
       //  setProgress(item.getProgress(), holder);
         holder.setProgress(item.getProgress());
         holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
+        if(item.getStatus().equals("done")){
+            holder.setProgress(100);
+            holder.rootsTextView.setText(item.getRootsAsString());
+            holder.isDoneCB.setChecked(true);
+            holder.cancelButton.setVisibility(View.GONE);
+            holder.cancelButton.setEnabled(false);
+
+            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setEnabled(true);
+        }
+        else{
+            holder.setProgress(item.getProgress());
+        }
+        // todo handle cancel, delete
+
         LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(id);
         workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
             @Override
             public void onChanged(WorkInfo workInfo) {
-                WorkInfo.State state = workInfo.getState();
+                if (workInfo.getState().equals(WorkInfo.State.SUCCEEDED)) {
+                    Data outputData = workInfo.getOutputData();
+                    int progress = outputData.getInt("progress", 0);
+                    item.setProgress(progress);
+                    holder.progressBar.setProgress(progress);
+                }
+                else if (workInfo.getState().equals(WorkInfo.State.RUNNING)) {
+                    Data outputData = workInfo.getOutputData();
+                    int progress = outputData.getInt("progress", 0);
+                    item.setProgress(progress);
+                    holder.progressBar.setProgress(progress);
+                }
                 holder.rootsTextView.setText(item.getRootsAsString());
                 holder.setProgress(item.getProgress());
-                System.out.println("state of " + id.toString()+ "is " + state );
             }
         });
+
+        holder.deleteButton.setOnClickListener(v -> {
+            this.list.remove(position);
+            deleteListener.onDeleteClick(item);
+        });
+
+        holder.cancelButton.setOnClickListener(v -> {
+            cancelListener.onCancelClick(item);
+        });
+
+
 
         /**
        // if (item.getStatus().equals("done")) {
