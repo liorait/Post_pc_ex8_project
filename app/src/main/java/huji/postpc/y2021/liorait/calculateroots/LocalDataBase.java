@@ -130,7 +130,7 @@ public class LocalDataBase {
 
         // update the live data of the changed
         mutableLiveData.setValue(new ArrayList<>(items));
-        sendBroadcastDbChanged(); // send broadcast
+      //  sendBroadcastDbChanged(); // send broadcast
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -147,11 +147,13 @@ public class LocalDataBase {
         }
 
         SharedPreferences.Editor editor = sp.edit();
-        editor.remove(toDelete.getId()); // remove the key
+        if (toDelete != null) {
+            editor.remove(toDelete.getId()); // remove the key
+        }
         editor.apply();
 
         mutableLiveData.setValue(new ArrayList<>(items));
-        sendBroadcastDbChanged();
+//        sendBroadcastDbChanged();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

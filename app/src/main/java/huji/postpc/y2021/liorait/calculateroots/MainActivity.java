@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         if (dataBase == null){
             dataBase = CalculateRootsApplication.getInstance().getDataBase();
         }
-      //  dataBase.deleteSp();// todo delete
+        //dataBase.deleteSp();// todo delete
 
         // application singleton
         CalculateRootsApplication application = (CalculateRootsApplication) getApplication();
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.setDeleteListener(new CalculationAdapterClass.DeleteClickListener() {
             public void onDeleteClick(CalculationItem item) {
                 dataBase.deleteItem(item.getId());
+               // adapter.notifyDataSetChanged();
                 //adapter.addCalculationListToAdapter(dataBase.getCopies());
             }
         });
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
                 //dataBase.deleteItem(item.getId());
                 UUID id = UUID.fromString(item.getId());
                 workManager.cancelWorkById(id);
+                item.setStatus("canceled");
+                adapter.notifyDataSetChanged();
                 //adapter.addCalculationListToAdapter(dataBase.getCopies());
             }
         });
@@ -227,6 +230,10 @@ public class MainActivity extends AppCompatActivity {
                    // ArrayList<CalculationItem> list = dataBase.getCopies();
                   //  adapter.addCalculationListToAdapter(list);
                     adapter.notifyDataSetChanged();
+                }
+                else if (workInfo.getState().equals(WorkInfo.State.CANCELLED)) {
+                    //holder.rootsTextView.setText("Calculation canceled");
+                    item.setStatus("canceled");
                 }
             }
         });

@@ -86,7 +86,7 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
 
       //  setProgress(item.getProgress(), holder);
         holder.setProgress(item.getProgress());
-        holder.rootsTextView.setText(item.getRootsAsString());
+       // holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
         if(item.getStatus().equals("done")){
@@ -98,6 +98,9 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
 
             holder.deleteButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setEnabled(true);
+        }
+        else if (item.getStatus().equals("canceled")){
+            holder.rootsTextView.setText("Calculation canceled");
         }
         else{
             holder.setProgress(item.getProgress());
@@ -113,14 +116,24 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                     int progress = outputData.getInt("progress", 0);
                     item.setProgress(progress);
                     holder.progressBar.setProgress(progress);
+                    holder.rootsTextView.setText(item.getRootsAsString());
                 }
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)) {
                     Data outputData = workInfo.getOutputData();
                     int progress = outputData.getInt("progress", 0);
                     item.setProgress(progress);
                     holder.progressBar.setProgress(progress);
+                    holder.rootsTextView.setText(item.getRootsAsString());
                 }
-                holder.rootsTextView.setText(item.getRootsAsString());
+                else if (workInfo.getState().equals(WorkInfo.State.CANCELLED)){
+                    holder.rootsTextView.setText("Calculation canceled");
+                    holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
+                    holder.cancelButton.setEnabled(false);
+
+                    holder.deleteButton.setVisibility(View.VISIBLE);
+                    holder.deleteButton.setEnabled(true);
+                }
+              //  holder.rootsTextView.setText(item.getRootsAsString());
                 holder.setProgress(item.getProgress());
             }
         });
@@ -131,8 +144,9 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         });
 
         holder.cancelButton.setOnClickListener(v -> {
-            cancelListener.onCancelClick(item);
 
+            holder.rootsTextView.setText("Calculation canceled");
+            cancelListener.onCancelClick(item);
             holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
             holder.cancelButton.setEnabled(false);
 
