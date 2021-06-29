@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,7 +27,7 @@ public class LocalDataBase {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public LocalDataBase(Context context){
         this.context = context;
-        //sortItems(); // todo
+        sortItems(); // todo
         this.sp = context.getSharedPreferences("local_db_calculation_items", Context.MODE_PRIVATE);
         initializeSp();
     }
@@ -48,9 +49,25 @@ public class LocalDataBase {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public ArrayList<CalculationItem> getCopies(){
-        //sortItems();
+        sortItems();
         return new ArrayList<>(items);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void sortItems() {
+        this.items.sort(new Comparator<CalculationItem>() {
+            @Override
+            public int compare(CalculationItem o1, CalculationItem o2) {
+                if (o1.getStatus().equals("new") && o2.getStatus().equals("new")) {
+                    String num1 = Long.toString(o1.getNumber());
+                    String num2 = Long.toString(o2.getNumber());
+                    return num2.compareTo(num1);
+                }
+                return 0;
+            }
+        });
+    }
+
 /**
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void markAsInProgress(String itemId){
@@ -77,6 +94,40 @@ public class LocalDataBase {
      //   CalculationItem oldItem = this.items.get(id);
 
        // this.items.remove(id);
+    }
+
+    public void updateState(CalculationItem item, String state){
+        String id = item.getId();
+        CalculationItem old = getById(id);
+
+        CalculationItem newItem = new CalculationItem(old.getId(), old.getNumber(), old.getStatus());
+        newItem.setStatus(state);
+        newItem.setProgress(old.getProgress());
+        newItem.setIsPrime(old.getIsPrime());
+        this.items.remove(old);
+        this.items.add(this.items.size(), newItem);
+
+        // update sp
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(item.getId(), item.itemStringRepresentation());
+        editor.apply();
+    }
+
+    public void updatePrime(CalculationItem item, boolean value){
+        String id = item.getId();
+        CalculationItem old = getById(id);
+
+        CalculationItem newItem = new CalculationItem(old.getId(), old.getNumber(), old.getStatus());
+        newItem.setIsPrime(value);
+        newItem.setProgress(old.getProgress());
+     //   newItem.setStatus(old.getStatus());
+        this.items.remove(old);
+        this.items.add(this.items.size(), newItem);
+
+        // update sp
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(item.getId(), item.itemStringRepresentation());
+        editor.apply();
     }
 
     public void deleteSp(){
@@ -116,8 +167,10 @@ public class LocalDataBase {
     public void addItem(CalculationItem item){
        // String newId = UUID.randomUUID().toString();
        // CalculationItem newItem = new CalculationItem(newId, number, state);
+
+        // all new items are in the beginning
         items.add(0, item);
-        //sortItems();
+        sortItems();
 
         // update sp of the changes
       //  SharedPreferences.Editor editor = sp.edit();

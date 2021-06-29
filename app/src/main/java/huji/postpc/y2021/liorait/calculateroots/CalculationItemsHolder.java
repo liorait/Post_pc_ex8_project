@@ -55,7 +55,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
               //  progressBar.setProgress(progress + 10);
                 Log.i("thread_progress",""+ progress);
                 if (progress + 10 <= 100) {
-                    setProgress(progress + 10);
+                    //setProgress(progress + 10);
                 }
             }
         });

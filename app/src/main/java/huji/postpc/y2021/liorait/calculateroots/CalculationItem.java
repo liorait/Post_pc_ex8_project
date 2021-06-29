@@ -14,12 +14,15 @@ public class CalculationItem implements Serializable {
     private int progress;
     private int total_progress;
     private Pair<Long, Long> roots;
+    private static String CALCULATING_ROOTS = "calculating roots..";
+    private static String NUMBER_IS_PRIME = "number is prime";
+
 
     public CalculationItem(String id, long number, String status) {
         this.number = number;
         this.status = status;
         this.itemId = id;
-        this.isPrime = false;
+        //this.isPrime = false;
         this.roots = null;
         this.total_progress = 100;
     }
@@ -31,7 +34,6 @@ public class CalculationItem implements Serializable {
     public boolean getIsPrime() {
         return this.isPrime;
     }
-
 
     public void setStatus(String status) {
         this.status = status;
@@ -75,12 +77,13 @@ public class CalculationItem implements Serializable {
 
     protected String itemStringRepresentation() {
         String rootsRepr = "";
+
         if (roots == null) {
             if (isPrime){
-                rootsRepr = "number is prime";
+                rootsRepr = NUMBER_IS_PRIME;
             }
             else{
-                rootsRepr = "calculating roots..";
+                rootsRepr = CALCULATING_ROOTS;
             }
         }
         else {
@@ -88,7 +91,13 @@ public class CalculationItem implements Serializable {
         }
         String numberStr = Long.toString(this.number);
         String prime = "";
-        if (isPrime){prime="true";}else{prime="false";}
+
+        if (this.isPrime){
+            prime = "true";
+        }
+        else{
+            prime = "false";
+        }
 
         String repr = numberStr + "/" + this.status + "/" + this.itemId + "/" +
         prime + "/" + Integer.toString(progress) + "/" + Integer.toString(total_progress) + "/" + rootsRepr;
@@ -99,19 +108,18 @@ public class CalculationItem implements Serializable {
     public String getRootsAsString(){
         String rootsStr = "";
 
-        //Pair<Long, Long> roots = this.getRoots();
         if (this.roots != null) {
             String firstRoot = roots.first.toString();
             String secondRoot = roots.second.toString();
             return firstRoot + " * " + secondRoot;
         }
         else if ((roots == null) && (this.isPrime)){
-             return "number is prime";
+             return NUMBER_IS_PRIME;
         }
-        return "calculating roots..";
+        return CALCULATING_ROOTS;
     }
 
-    static protected CalculationItem stringToCalculationItem(String stringRepr) {
+     static protected CalculationItem stringToCalculationItem(String stringRepr) {
         if (stringRepr == null) return null;
         try {
             String val = stringRepr;
@@ -150,7 +158,7 @@ public class CalculationItem implements Serializable {
             newItem.progress = progressInt;
             newItem.total_progress = totalProgressInt;
 
-            if (rootsRepr.equals("number is prime") || (rootsRepr.equals("calculating roots.."))) {
+            if (rootsRepr.equals(NUMBER_IS_PRIME) || (rootsRepr.equals(CALCULATING_ROOTS))) {
                 newItem.roots = null;
             }
             else{

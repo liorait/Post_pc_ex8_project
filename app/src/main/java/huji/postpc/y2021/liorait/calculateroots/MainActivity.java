@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     String is_prime = outputData.getString("is_prime");
 
                     item.setStatus("done");
+                    dataBase.updateState(item, "done");
                   //  dataBase.updateStatus(item, "done");
                     adapter.notifyDataSetChanged();
                     item.setProgress(100);
@@ -209,7 +210,10 @@ public class MainActivity extends AppCompatActivity {
                         long second_root = outputData.getLong("second_root", -1);
                         Pair<Long, Long> roots = new Pair<>(first_root, second_root);
                         item.setRoots(roots);
+                        item.setIsPrime(false);
+                        dataBase.updateState(item, "done");
                        // item.setStatus("done");
+                        dataBase.updatePrime(item, false);
                         dataBase.updateRoots(item, roots);
                         adapter.notifyDataSetChanged();
                     }
@@ -218,9 +222,11 @@ public class MainActivity extends AppCompatActivity {
                         //rootsTextView.setText("number is prime");
                       //  item.setStatus("done");
                         item.setRoots(null);
+                        dataBase.updateState(item, "done");
+                        dataBase.updatePrime(item, true);
                         item.setIsPrime(true);
-                       // ArrayList<CalculationItem> list = dataBase.getCopies();
-                       // adapter.addCalculationListToAdapter(list);
+                        ArrayList<CalculationItem> list = dataBase.getCopies();
+                        adapter.addCalculationListToAdapter(list);
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -237,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 else if (workInfo.getState().equals(WorkInfo.State.CANCELLED)) {
                     //holder.rootsTextView.setText("Calculation canceled");
                     item.setStatus("canceled");
+                   // dataBase.updateState(item, "done");
                     adapter.notifyDataSetChanged();
                 }
             }

@@ -88,7 +88,7 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
       //  setProgress(item.getProgress(), holder);
       //  holder.setProgress(item.getProgress());
         Log.i("progress_item" ,"" + item.getProgress()+"num"+item.getNumber());
-       // holder.rootsTextView.setText(item.getRootsAsString());
+        holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
         if(item.getStatus().equals("done")){
