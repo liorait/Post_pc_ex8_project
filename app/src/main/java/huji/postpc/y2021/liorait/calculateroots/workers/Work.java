@@ -75,9 +75,19 @@ public class Work extends Worker {
             //long endTime = timeStartMs + 20000L;
 
         long i = workSp.getLong("reached_calculation_number" + numberToCalculateRootsFor, 2);
+        Log.i("progress",""+ i);
         long total = (long) Math.sqrt(numberToCalculateRootsFor);
 
         while (i <= total){
+
+            if (i % 4 == 0) {
+                int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
+                if (progress != currentProgress) {
+                    progress = currentProgress;
+                }
+                this.setProgressAsync(new Data.Builder().putInt("progress", progress).build());
+            }
+
             if (this.isStopped()){
 
                 // Save current number reached to
@@ -89,9 +99,12 @@ public class Work extends Worker {
             }
             else {
 
-                if (i % 2 == 0) {
-                    int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
-                    this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
+               // if (i % 4 == 0) {
+                  //  int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
+                  //  if (progress != currentProgress){
+                  //      progress = currentProgress;
+                  //  }
+                  //  this.setProgressAsync(new Data.Builder().putInt("progress", progress).build());
                 }
                 long timeout = 540000L;
                 if (System.currentTimeMillis() - beginTime > timeout){
@@ -132,8 +145,7 @@ public class Work extends Worker {
                 editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
                 editor.apply();
                 i++;
-            }
-        }
+            } // end of while
 
         this.isDone = true;
         return null;

@@ -1,6 +1,7 @@
 package huji.postpc.y2021.liorait.calculateroots;
 
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
@@ -50,7 +51,12 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }
-                setProgress(progress + 10);
+
+              //  progressBar.setProgress(progress + 10);
+                Log.i("thread_progress",""+ progress);
+                if (progress + 10 <= 100) {
+                    setProgress(progress + 10);
+                }
             }
         });
         thread.start();

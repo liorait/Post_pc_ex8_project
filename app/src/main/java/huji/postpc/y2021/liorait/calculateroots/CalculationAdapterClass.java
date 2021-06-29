@@ -3,6 +3,7 @@ package huji.postpc.y2021.liorait.calculateroots;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,12 +86,14 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         holder.progressBar.setProgress(item.getProgress());
 
       //  setProgress(item.getProgress(), holder);
-        holder.setProgress(item.getProgress());
+      //  holder.setProgress(item.getProgress());
+        Log.i("progress_item" ,"" + item.getProgress()+"num"+item.getNumber());
        // holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
         if(item.getStatus().equals("done")){
-            holder.setProgress(100);
+          //  holder.setProgress(100);
+            holder.progressBar.setProgress(100);
             holder.rootsTextView.setText(item.getRootsAsString());
             holder.isDoneCB.setChecked(true);
             holder.cancelButton.setVisibility(View.GONE);
@@ -103,9 +106,10 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
             holder.rootsTextView.setText("Calculation canceled");
         }
         else{
-            holder.setProgress(item.getProgress());
+         //   holder.setProgress(item.getProgress());
+            holder.progressBar.setProgress(item.getProgress());
         }
-        // todo handle cancel, delete
+
 
         LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(id);
         workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
@@ -115,13 +119,17 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                     Data outputData = workInfo.getOutputData();
                     int progress = outputData.getInt("progress", 0);
                     item.setProgress(progress);
-                    holder.progressBar.setProgress(progress);
+                    holder.progressBar.setProgress(100);
+                  //  holder.progressBar.setProgress(progress);
+                    holder.rootsTextView.setText(item.getRootsAsString());
                     holder.rootsTextView.setText(item.getRootsAsString());
                 }
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)) {
-                    Data outputData = workInfo.getOutputData();
-                    int progress = outputData.getInt("progress", 0);
-                    item.setProgress(progress);
+                  //  Data outputData = workInfo.getOutputData();
+                    Integer progress = workInfo.getProgress().getInt("progress", 0);
+                   // Integer progress = outputData.getInt("progress", 0);
+                    item.setProgress(progress); //todo keep?
+                    Log.i("progress_in_adapter" ,"" + progress+"num"+item.getNumber());
                     holder.progressBar.setProgress(progress);
                     holder.rootsTextView.setText(item.getRootsAsString());
                 }
@@ -129,14 +137,14 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                     holder.rootsTextView.setText("Calculation canceled");
                     holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
                     holder.cancelButton.setEnabled(false);
-
                     holder.deleteButton.setVisibility(View.VISIBLE);
                     holder.deleteButton.setEnabled(true);
                 }
               //  holder.rootsTextView.setText(item.getRootsAsString());
-                holder.setProgress(item.getProgress());
+               // holder.setProgress(item.getProgress());
             }
         });
+
 
         holder.deleteButton.setOnClickListener(v -> {
             this.list.remove(position);
