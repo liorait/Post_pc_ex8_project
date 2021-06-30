@@ -85,6 +85,10 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
 
         holder.progressBar.setProgress(item.getProgress());
 
+        if (item.getIsPrime()){
+            holder.rootsTextView.setText("number is prime");
+        }
+
       //  setProgress(item.getProgress(), holder);
       //  holder.setProgress(item.getProgress());
         Log.i("progress_item" ,"" + item.getProgress()+"num"+item.getNumber());
@@ -104,6 +108,10 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         }
         else if (item.getStatus().equals("canceled")){
             holder.rootsTextView.setText("Calculation canceled");
+            holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
+            holder.cancelButton.setEnabled(false);
+            holder.deleteButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setEnabled(true);
         }
         else{
          //   holder.setProgress(item.getProgress());
@@ -152,12 +160,12 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         });
 
         holder.cancelButton.setOnClickListener(v -> {
-
-            holder.rootsTextView.setText("Calculation canceled");
+           // holder.rootsTextView.setText("Calculation canceled");
+            // todo update in db
+          //  item.setStatus("canceled");
             cancelListener.onCancelClick(item);
             holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
             holder.cancelButton.setEnabled(false);
-
             holder.deleteButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setEnabled(true);
         });

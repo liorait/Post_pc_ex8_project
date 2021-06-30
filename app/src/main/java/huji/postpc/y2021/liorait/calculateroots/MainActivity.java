@@ -100,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
                 //dataBase.deleteItem(item.getId());
                 UUID id = UUID.fromString(item.getId());
                 workManager.cancelWorkById(id);
-                item.setStatus("canceled");
+               // item.setStatus("canceled");
+                dataBase.updateState(item, "canceled");
                 adapter.notifyDataSetChanged();
                 //adapter.addCalculationListToAdapter(dataBase.getCopies());
             }

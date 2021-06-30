@@ -27,7 +27,7 @@ public class LocalDataBase {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public LocalDataBase(Context context){
         this.context = context;
-        sortItems(); // todo
+        sortItems();
         this.sp = context.getSharedPreferences("local_db_calculation_items", Context.MODE_PRIVATE);
         initializeSp();
     }
