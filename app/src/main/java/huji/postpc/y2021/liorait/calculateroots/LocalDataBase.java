@@ -68,11 +68,21 @@ public class LocalDataBase {
         });
     }
 
-   // public void editProgress(UUID id, int progress){
-     //   CalculationItem oldItem = this.items.get(id);
+    public void editProgress(CalculationItem item, int progress){
+        String id = item.getId();
+        CalculationItem old = getById(id);
 
-       // this.items.remove(id);
-    //}
+        CalculationItem newItem = new CalculationItem(old.getId(), old.getNumber(), old.getStatus());
+        newItem.setProgress(progress);
+        newItem.setIsPrime(old.getIsPrime());
+        this.items.remove(old);
+        this.items.add(this.items.size(), newItem);
+
+        // update sp
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(item.getId(), item.itemStringRepresentation());
+        editor.apply();
+    }
 
     public void updateState(CalculationItem item, String state){
         String id = item.getId();
@@ -98,7 +108,6 @@ public class LocalDataBase {
         CalculationItem newItem = new CalculationItem(old.getId(), old.getNumber(), old.getStatus());
         newItem.setIsPrime(value);
         newItem.setProgress(old.getProgress());
-     //   newItem.setStatus(old.getStatus());
         this.items.remove(old);
         this.items.add(this.items.size(), newItem);
 
@@ -143,17 +152,11 @@ public class LocalDataBase {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void addItem(CalculationItem item){
-       // String newId = UUID.randomUUID().toString();
-       // CalculationItem newItem = new CalculationItem(newId, number, state);
 
         // all new items are in the beginning
         items.add(0, item);
         sortItems();
 
-        // update sp of the changes
-      //  SharedPreferences.Editor editor = sp.edit();
-       // editor.putString(newItem.getId(), newItem.itemStringRepresentation());
-      //  editor.apply();
         // update sp of the changes
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(item.getId(), item.itemStringRepresentation());

@@ -41,7 +41,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
     public ArrayList<CalculationItem> getCurrentItems() {
         return this.calculationsList;
     }
-/**
+
     public void setProgress(int progress){
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -61,7 +61,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
         });
         thread.start();
     }
- */
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)

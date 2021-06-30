@@ -85,13 +85,7 @@ public class Work extends Worker {
             if (i % 20 == 0) {
 
                 int currentProgress = (int) Math.ceil(((double) i / square) * 100);
-             //   int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
                 Log.i("current prog in work", "" + currentProgress + "num" + numberToCalculateRootsFor);
-
-                // if (!progress.equals(currentProgress)) {
-                //     progress = currentProgress;
-                // }
-
                 Log.i("progress in work", "" + currentProgress + "i" + i + " num" + numberToCalculateRootsFor);
                 this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
             }

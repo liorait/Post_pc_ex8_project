@@ -82,21 +82,18 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         holder.cancelButton.setVisibility(View.VISIBLE);
         holder.progressBar.setVisibility(View.VISIBLE);
         holder.isDoneCB.setChecked(false);
-
         holder.progressBar.setProgress(item.getProgress());
 
         if (item.getIsPrime()){
             holder.rootsTextView.setText("number is prime");
         }
 
-      //  setProgress(item.getProgress(), holder);
-      //  holder.setProgress(item.getProgress());
         Log.i("progress in adapter" ,"" + item.getProgress()+"num"+item.getNumber());
         holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
         if(item.getStatus().equals("done")){
-          //  holder.setProgress(100);
+            //holder.setProgress(100);
             holder.progressBar.setProgress(100);
             holder.isDoneCB.setChecked(true);
             holder.cancelButton.setVisibility(View.GONE);
@@ -108,16 +105,14 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         }
         else if (item.getStatus().equals("canceled")){
             holder.rootsTextView.setText("Calculation canceled");
-            holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
+            holder.cancelButton.setVisibility(View.GONE);
             holder.cancelButton.setEnabled(false);
             holder.deleteButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setEnabled(true);
         }
         else{
-         //   holder.setProgress(item.getProgress());
             holder.progressBar.setProgress(item.getProgress());
         }
-
 
         LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(id);
         workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
@@ -134,28 +129,23 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                     }
                     item.setProgress(progress);
                     holder.progressBar.setProgress(100);
-                  //  holder.progressBar.setProgress(progress);
                     holder.rootsTextView.setText(item.getRootsAsString());
                     holder.rootsTextView.setText(item.getRootsAsString());
                 }
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)) {
-                  //  Data outputData = workInfo.getOutputData();
                     int progress = workInfo.getProgress().getInt("progress", 0);
-                   // Integer progress = outputData.getInt("progress", 0);
-                    item.setProgress(progress); //todo keep?
+                    item.setProgress(progress);
                     Log.i("progress_in_adapter_obs" ,"" + progress+" num"+item.getNumber());
                     holder.progressBar.setProgress(progress);
                     holder.rootsTextView.setText(item.getRootsAsString());
                 }
                 else if (workInfo.getState().equals(WorkInfo.State.CANCELLED)){
                     holder.rootsTextView.setText("Calculation canceled");
-                    holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
+                    holder.cancelButton.setVisibility(View.GONE);
                     holder.cancelButton.setEnabled(false);
                     holder.deleteButton.setVisibility(View.VISIBLE);
                     holder.deleteButton.setEnabled(true);
                 }
-              //  holder.rootsTextView.setText(item.getRootsAsString());
-               // holder.setProgress(item.getProgress());
             }
         });
 
@@ -165,12 +155,8 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
         });
 
         holder.cancelButton.setOnClickListener(v -> {
-           // holder.rootsTextView.setText("Calculation canceled");
-            // todo update in db
-          //  item.setStatus("canceled");
             cancelListener.onCancelClick(item);
-            holder.cancelButton.setVisibility(View.GONE); // todo delete from here?
-            holder.cancelButton.setEnabled(false);
+            holder.cancelButton.setVisibility(View.GONE);
             holder.deleteButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setEnabled(true);
         });

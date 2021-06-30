@@ -146,8 +146,6 @@ public class CalculationItem implements Serializable {
                 return null;
             }
 
-            // parse string to UUID
-            //UUID id = UUID.fromString(itemId);
             boolean prime = false;
             if (isPrime.equals("true")) {
                 prime = true;
@@ -158,7 +156,7 @@ public class CalculationItem implements Serializable {
 
             // create a new item
             CalculationItem newItem = new CalculationItem(itemId, userInputLong, status);
-            newItem.isPrime = prime; // todo setter
+            newItem.isPrime = prime;
             newItem.progress = progressInt;
             newItem.total_progress = totalProgressInt;
 

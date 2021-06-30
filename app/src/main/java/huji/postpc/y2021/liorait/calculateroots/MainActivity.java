@@ -52,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
         if (dataBase == null){
             dataBase = CalculateRootsApplication.getInstance().getDataBase();
         }
-       // dataBase.deleteSp();// todo delete
-      //  workManager.cancelAllWork();
 
         // application singleton
         CalculateRootsApplication application = (CalculateRootsApplication) getApplication();
@@ -90,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
                 dataBase.deleteItem(item.getId());
                 UUID id = UUID.fromString(item.getId());
                 //workManager.cancelWorkById(id); deletes only what is done
+                adapter.addCalculationListToAdapter(dataBase.getCopies());
                 adapter.notifyDataSetChanged();
-                //adapter.addCalculationListToAdapter(dataBase.getCopies());
             }
         });
 
@@ -126,18 +124,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // workManager.enqueueUniqueWork()
                 workManager.enqueue(request);
-
-                UUID requesId = request.getId();
-
-                // live data of the status of the worker todo delete
-                LiveData<WorkInfo> workInfoByIdLiveData = workManager.getWorkInfoByIdLiveData(requesId);
-                workInfoByIdLiveData.observeForever(new Observer<WorkInfo>() {
-                    @Override
-                    public void onChanged(WorkInfo workInfo) {
-                        WorkInfo.State state = workInfo.getState();
-                        System.out.println("state of " + requesId.toString()+ "is " + state );
-                    }
-                });
 
                 CalculationItem item = new CalculationItem(request.getId().toString(), userInputLong, NEW);
                 dataBase.addItem(item); // Adds item to local db
@@ -193,15 +179,11 @@ public class MainActivity extends AppCompatActivity {
                         item.setRoots(roots);
                         item.setIsPrime(false);
                         dataBase.updateState(item, "done");
-                       // item.setStatus("done");
                         dataBase.updatePrime(item, false);
                         dataBase.updateRoots(item, roots);
                         adapter.notifyDataSetChanged();
                     }
                     else if (is_prime.equals("true")){
-                        //TextView rootsTextView = findViewById(R.id.rootsTextView);
-                        //rootsTextView.setText("number is prime");
-                      //  item.setStatus("done");
                         item.setRoots(null);
                         dataBase.updateState(item, "done");
                         dataBase.updatePrime(item, true);
@@ -215,17 +197,13 @@ public class MainActivity extends AppCompatActivity {
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)){
                     int progress = workInfo.getProgress().getInt("progress", 0);
                     Log.i("got progress in main", "" + progress + "of num" + item.getNumber());
-                  //  setProgressForItem(progress);
-                 //   dataBase.editProgress(item.getId(), progress);
+                    dataBase.editProgress(item, progress);
                     item.setProgress(progress);
-                   // ArrayList<CalculationItem> list = dataBase.getCopies();
-                  //  adapter.addCalculationListToAdapter(list);
                     adapter.notifyDataSetChanged();
                 }
                 else if (workInfo.getState().equals(WorkInfo.State.CANCELLED)) {
                     //holder.rootsTextView.setText("Calculation canceled");
                     item.setStatus("canceled");
-                   // dataBase.updateState(item, "done");
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -249,23 +227,3 @@ public class MainActivity extends AppCompatActivity {
         adapter.addCalculationListToAdapter(dataBase.getCopies());
     }
 }
-
-/**
- * todo
- * set view holder - done
- * set adapter - done
- * create adapter class
- * create layout for row (cancel)
- * create layout for main activity
- * create layout for add calculation activity
- * build local db
- * save data into sp
- * the local db has a list that updates the adapter's list in any change
- * adapter sends changes to main activity, there it updates the db and then the adapter
- * create work - calculation roots
- * start work manager
- * create order for the list of calculations
- * cancel a calculation
- * delete finished calculation
- * create progress bar that is updates by work
- */
