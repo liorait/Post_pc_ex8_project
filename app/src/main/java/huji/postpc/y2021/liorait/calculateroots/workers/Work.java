@@ -79,22 +79,12 @@ public class Work extends Worker {
 
         while (i <= total){
 
-           // if (i % 4 == 0) {
-           //     int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
-           //     if (progress != currentProgress) {
-           //         progress = currentProgress;
-           //     }
-           ///     Log.i("progress in work",""+ i + "num" + numberToCalculateRootsFor);
-              //  this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
-          //  }
-        //    Integer currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
             Log.i("current i in work", "i " + i + " num" + numberToCalculateRootsFor);
             long square = (long) Math.ceil(Math.sqrt(numberToCalculateRootsFor));
 
             if (i % 20 == 0) {
 
                 int currentProgress = (int) Math.ceil(((double) i / square) * 100);
-
              //   int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
                 Log.i("current prog in work", "" + currentProgress + "num" + numberToCalculateRootsFor);
 
@@ -106,8 +96,6 @@ public class Work extends Worker {
                 this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
             }
 
-
-
             if (this.isStopped()){
 
                 // Save current number reached to
@@ -117,58 +105,50 @@ public class Work extends Worker {
                 this.isDone = false;
                 return null;
             }
-            else {
 
-               // if (i % 4 == 0) {
-                  //  int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
-                  //  if (progress != currentProgress){
-                  //      progress = currentProgress;
-                  //  }
-                  //  this.setProgressAsync(new Data.Builder().putInt("progress", progress).build());
-                }
-                long timeout = 540000L;
-                if (System.currentTimeMillis() - beginTime > timeout){
+            long timeout = 540000L;
+            if (System.currentTimeMillis() - beginTime > timeout){
 
-                    // Save current number reached to
-                    SharedPreferences.Editor editor = workSp.edit();
-                    editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
-                    editor.apply();
-                    isRetry = true;
-                    return null;
-                }
-                if(i%3000L==0){
-                    SharedPreferences.Editor editor = workSp.edit();
-                    editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
-                    editor.apply();
-                }
-
-                long root = (long) (numberToCalculateRootsFor / i);
-
-                if (numberToCalculateRootsFor % i == 0) {
-                    Long j = (long) (numberToCalculateRootsFor / root);
-                    Pair<Long, Long> newPair = new Pair<>(j, root);
-
-                    // save to sp
-                    SharedPreferences.Editor editor = workSp.edit();
-                    editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
-                    editor.apply();
-
-                    this.isDone = true;
-                    return newPair;
-                }
-
-                try {
-                    Thread.sleep(1000L);
-                }
-                catch(InterruptedException e){
-                    Log.e("delay", " error in thread delay");
-                }
-
+                // Save current number reached to
                 SharedPreferences.Editor editor = workSp.edit();
                 editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
                 editor.apply();
-                i++;
-            } // end of while
+                isRetry = true;
+                return null;
+            }
+            if(i % 3000L==0){
+                SharedPreferences.Editor editor = workSp.edit();
+                editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                editor.apply();
+            }
+
+            long root = (long) (numberToCalculateRootsFor / i);
+
+            if (numberToCalculateRootsFor % i == 0) {
+                Long j = (long) (numberToCalculateRootsFor / root);
+                Pair<Long, Long> newPair = new Pair<>(j, root);
+
+                // save to sp
+                SharedPreferences.Editor editor = workSp.edit();
+                editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+                editor.apply();
+
+                this.isDone = true;
+                return newPair;
+            }
+
+            try {
+                Thread.sleep(1000L);
+            }
+            catch(InterruptedException e){
+                Log.e("delay", " error in thread delay");
+            }
+
+            SharedPreferences.Editor editor = workSp.edit();
+            editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
+            editor.apply();
+            i++;
+        } // end of while
 
         this.isDone = true;
         return null;

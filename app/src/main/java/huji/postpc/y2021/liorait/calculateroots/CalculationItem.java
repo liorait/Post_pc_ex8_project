@@ -31,6 +31,10 @@ public class CalculationItem implements Serializable {
         this.isPrime = prime;
     }
 
+    public int getTotalProgress() {
+        return this.total_progress;
+    }
+
     public boolean getIsPrime() {
         return this.isPrime;
     }

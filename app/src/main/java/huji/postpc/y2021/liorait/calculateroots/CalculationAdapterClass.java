@@ -91,20 +91,20 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
 
       //  setProgress(item.getProgress(), holder);
       //  holder.setProgress(item.getProgress());
-        Log.i("progress_item in adap" ,"" + item.getProgress()+"num"+item.getNumber());
+        Log.i("progress in adapter" ,"" + item.getProgress()+"num"+item.getNumber());
         holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
         if(item.getStatus().equals("done")){
           //  holder.setProgress(100);
             holder.progressBar.setProgress(100);
-            holder.rootsTextView.setText(item.getRootsAsString());
             holder.isDoneCB.setChecked(true);
             holder.cancelButton.setVisibility(View.GONE);
             holder.cancelButton.setEnabled(false);
 
             holder.deleteButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setEnabled(true);
+
         }
         else if (item.getStatus().equals("canceled")){
             holder.rootsTextView.setText("Calculation canceled");
@@ -126,6 +126,12 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                 if (workInfo.getState().equals(WorkInfo.State.SUCCEEDED)) {
                     Data outputData = workInfo.getOutputData();
                     int progress = outputData.getInt("progress", 0);
+                    String is_prime = outputData.getString("is_prime");
+
+                    if (is_prime.equals("true")){
+                        item.setRoots(null);
+                        item.setIsPrime(true);
+                    }
                     item.setProgress(progress);
                     holder.progressBar.setProgress(100);
                   //  holder.progressBar.setProgress(progress);
