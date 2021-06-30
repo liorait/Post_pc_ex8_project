@@ -91,7 +91,7 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
 
       //  setProgress(item.getProgress(), holder);
       //  holder.setProgress(item.getProgress());
-        Log.i("progress_item" ,"" + item.getProgress()+"num"+item.getNumber());
+        Log.i("progress_item in adap" ,"" + item.getProgress()+"num"+item.getNumber());
         holder.rootsTextView.setText(item.getRootsAsString());
         UUID id = UUID.fromString(item.getId());
 
@@ -134,10 +134,10 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                 }
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)) {
                   //  Data outputData = workInfo.getOutputData();
-                    Integer progress = workInfo.getProgress().getInt("progress", 0);
+                    int progress = workInfo.getProgress().getInt("progress", 0);
                    // Integer progress = outputData.getInt("progress", 0);
                     item.setProgress(progress); //todo keep?
-                    Log.i("progress_in_adapter" ,"" + progress+"num"+item.getNumber());
+                    Log.i("progress_in_adapter_obs" ,"" + progress+" num"+item.getNumber());
                     holder.progressBar.setProgress(progress);
                     holder.rootsTextView.setText(item.getRootsAsString());
                 }
@@ -152,7 +152,6 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
                // holder.setProgress(item.getProgress());
             }
         });
-
 
         holder.deleteButton.setOnClickListener(v -> {
             this.list.remove(position);
@@ -169,24 +168,6 @@ public class CalculationAdapterClass extends RecyclerView.Adapter<CalculationIte
             holder.deleteButton.setVisibility(View.VISIBLE);
             holder.deleteButton.setEnabled(true);
         });
-
-
-
-        /**
-       // if (item.getStatus().equals("done")) {
-        Pair<Long, Long> roots = item.getRoots();
-        if (roots != null) {
-            String firstRoot = roots.first.toString();
-            String secondRoot = roots.second.toString();
-            holder.rootsTextView.setText(firstRoot + " * " + secondRoot);
-        }
-        else if ((roots == null) && (item.getIsPrime())){
-            holder.rootsTextView.setText("number is prime");
-        }
-        //else{
-//            holder.setProgress(item.getProgress());
-       // }
-         */
     }
 
     @Override

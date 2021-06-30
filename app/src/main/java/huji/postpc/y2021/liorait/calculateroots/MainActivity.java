@@ -89,49 +89,31 @@ public class MainActivity extends AppCompatActivity {
             public void onDeleteClick(CalculationItem item) {
                 dataBase.deleteItem(item.getId());
                 UUID id = UUID.fromString(item.getId());
-                workManager.cancelWorkById(id);
-               // adapter.notifyDataSetChanged();
+                //workManager.cancelWorkById(id); deletes only what is done
+                adapter.notifyDataSetChanged();
                 //adapter.addCalculationListToAdapter(dataBase.getCopies());
             }
         });
 
         adapter.setCancelListener(new CalculationAdapterClass.CancelClickListener() {
             public void onCancelClick(CalculationItem item) {
-                //dataBase.deleteItem(item.getId());
                 UUID id = UUID.fromString(item.getId());
                 workManager.cancelWorkById(id);
-               // item.setStatus("canceled");
                 dataBase.updateState(item, "canceled");
                 adapter.notifyDataSetChanged();
                 //adapter.addCalculationListToAdapter(dataBase.getCopies());
             }
         });
 
-
         // Adds a new calculation item
         buttonAddToDoItem.setOnClickListener(v -> {
 
             String userInputString = textInsertTask.getText().toString();
-
             long userInputLong = parseStringToLong(userInputString);
             if (userInputLong == -1)
             {
                 Toast.makeText(this, "could not convert String to Long", Toast.LENGTH_SHORT).show();
             }
-          //  System.out.println(userInputLong);
-            /**
-            // parse string to long
-            long userInputLong = 0;
-            try {
-                userInputLong = Long.parseLong(userInputString);
-            }
-            catch (NumberFormatException e){
-                Toast.makeText(this, "could not convert String to Long", Toast.LENGTH_SHORT).show();
-                Log.e("error", "could not convert String to Long");
-                return;
-            }
-             */
-           // workManager.cancelAllWork();// todo delete
 
             // add to the adapter
             // If the text isn't empty, creates a new calculation object
@@ -172,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
     } // end of on create
 
-
     private long parseStringToLong(String userInputString){
 
         // parse string to long
@@ -191,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
     // listen to work information
     private void observeCalculationItemWork(CalculationItem item){
         UUID workId = UUID.fromString(item.getId());
+
         workManager.getWorkInfoByIdLiveData(workId).observe(this, new Observer<WorkInfo>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -198,10 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 if (workInfo.getState().equals(WorkInfo.State.SUCCEEDED)){
                     Data outputData = workInfo.getOutputData();
                     String is_prime = outputData.getString("is_prime");
-
                     item.setStatus("done");
                     dataBase.updateState(item, "done");
-                  //  dataBase.updateStatus(item, "done");
                     adapter.notifyDataSetChanged();
                     item.setProgress(100);
 
@@ -233,7 +213,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 // update progress bar
                 else if (workInfo.getState().equals(WorkInfo.State.RUNNING)){
-                    Integer progress = workInfo.getProgress().getInt("progress", 0);
+                    int progress = workInfo.getProgress().getInt("progress", 0);
+                    Log.i("got progress in main", "" + progress + "of num" + item.getNumber());
                   //  setProgressForItem(progress);
                  //   dataBase.editProgress(item.getId(), progress);
                     item.setProgress(progress);

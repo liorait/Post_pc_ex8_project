@@ -55,7 +55,7 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
               //  progressBar.setProgress(progress + 10);
                 Log.i("thread_progress",""+ progress);
                 if (progress + 10 <= 100) {
-                    //setProgress(progress + 10);
+                    setProgress(progress + 10);
                 }
             }
         });
@@ -65,13 +65,15 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private ArrayList<String> saveItemsRepresentation(){
+
         // goes over the list items and for each item create string representation and save
         ArrayList<String> itemsStrList = new ArrayList<>();
+        ArrayList<CalculationItem> copies = dataBase.getCopies();
 
-        ArrayList<CalculationItem> dbList = new ArrayList(dataBase.getCopies());
+       // ArrayList<CalculationItem> dbList = new ArrayList(copies);
 
-        for (int i = 0; i < dbList.size(); i++){
-            String itemStr = dbList.get(i).itemStringRepresentation();
+        for (int i = 0; i < copies.size(); i++){
+            String itemStr = copies.get(i).itemStringRepresentation();
             itemsStrList.add(itemStr);
         }
         return itemsStrList;
@@ -90,12 +92,13 @@ public class CalculationItemsHolder extends RecyclerView.ViewHolder {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void convertStringListToCalculationList(ArrayList<String> listStr) {
-        for (int i = 0; i < listStr.size(); i++)
-        {
+       // for (int i = 0; i < listStr.size(); i++)
+       // {
             // create a new item
-            CalculationItem newItem = CalculationItem.stringToCalculationItem(listStr.get(i));
-            dataBase.addItem(newItem);
-        }
+        //    CalculationItem newItem = CalculationItem.stringToCalculationItem(listStr.get(i));
+        //    dataBase.addItem(newItem);
+       // }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

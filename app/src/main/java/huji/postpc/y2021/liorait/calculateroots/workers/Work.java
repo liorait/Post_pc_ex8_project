@@ -21,6 +21,7 @@ public class Work extends Worker {
     private SharedPreferences workSp;
     private boolean isDone;
     private long beginTime;
+    private String PROGRESS = "progress";
     private boolean isRetry = false;
     // declares work
 
@@ -28,7 +29,7 @@ public class Work extends Worker {
         super(context, parameters);
         progress = 0;
         // Send status updates
-        this.setProgressAsync(new Data.Builder().putInt("progress", progress).putInt("total", total).build());
+        this.setProgressAsync(new Data.Builder().putInt(PROGRESS, progress).putInt("total", total).build());
         CalculateRootsApplication application = (CalculateRootsApplication) getApplicationContext();
         workSp = application.getWorkSp();
         this.isDone = false;
@@ -71,22 +72,41 @@ public class Work extends Worker {
     }
 
     private Pair<Long, Long> calculateRoots(long numberToCalculateRootsFor) {
-           // long timeStartMs = System.currentTimeMillis();
-            //long endTime = timeStartMs + 20000L;
 
         long i = workSp.getLong("reached_calculation_number" + numberToCalculateRootsFor, 2);
-        Log.i("progress",""+ i);
+        Log.i("progress roots from",""+ i +  " num" + numberToCalculateRootsFor);
         long total = (long) Math.sqrt(numberToCalculateRootsFor);
 
         while (i <= total){
 
-            if (i % 4 == 0) {
-                int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
-                if (progress != currentProgress) {
-                    progress = currentProgress;
-                }
-                this.setProgressAsync(new Data.Builder().putInt("progress", progress).build());
+           // if (i % 4 == 0) {
+           //     int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
+           //     if (progress != currentProgress) {
+           //         progress = currentProgress;
+           //     }
+           ///     Log.i("progress in work",""+ i + "num" + numberToCalculateRootsFor);
+              //  this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
+          //  }
+        //    Integer currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
+            Log.i("current i in work", "i " + i + " num" + numberToCalculateRootsFor);
+            long square = (long) Math.ceil(Math.sqrt(numberToCalculateRootsFor));
+
+            if (i % 20 == 0) {
+
+                int currentProgress = (int) Math.ceil(((double) i / square) * 100);
+
+             //   int currentProgress = (int) Math.ceil(((double) i / (numberToCalculateRootsFor / 2.0)) * 100);
+                Log.i("current prog in work", "" + currentProgress + "num" + numberToCalculateRootsFor);
+
+                // if (!progress.equals(currentProgress)) {
+                //     progress = currentProgress;
+                // }
+
+                Log.i("progress in work", "" + currentProgress + "i" + i + " num" + numberToCalculateRootsFor);
+                this.setProgressAsync(new Data.Builder().putInt("progress", currentProgress).build());
             }
+
+
 
             if (this.isStopped()){
 
@@ -128,6 +148,7 @@ public class Work extends Worker {
                     Long j = (long) (numberToCalculateRootsFor / root);
                     Pair<Long, Long> newPair = new Pair<>(j, root);
 
+                    // save to sp
                     SharedPreferences.Editor editor = workSp.edit();
                     editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
                     editor.apply();
@@ -135,12 +156,14 @@ public class Work extends Worker {
                     this.isDone = true;
                     return newPair;
                 }
+
                 try {
-                    Thread.sleep(1000L); // todo need?
+                    Thread.sleep(1000L);
                 }
                 catch(InterruptedException e){
-
+                    Log.e("delay", " error in thread delay");
                 }
+
                 SharedPreferences.Editor editor = workSp.edit();
                 editor.putLong("reached_calculation_number" + numberToCalculateRootsFor, i);
                 editor.apply();
